@@ -2,7 +2,7 @@
 <html lang="pl-PL">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>KPE - ŁAZIK</title>
+    <title>KPE - Rover</title>
     <style>
         html, body {
             height: 100%;
@@ -38,7 +38,7 @@
         }
 
         #Container {
-            flex: 1; /* <- Wypełnia środek między headerem a footerem */
+            flex: 1; 
             background-color: white;
             padding: 0;
         }
@@ -101,7 +101,7 @@
             flex-shrink: 1;
         }
 
-        /* Responsywność */
+
         @media (max-width: 768px) {
             header h3 {
                 font-size: 200%;
@@ -184,9 +184,9 @@
 </html>
 
 <script>
-const ESP_IP = "192.168.4.1"; // <- zmień jeśli Twój ESP ma inne IP
+const ESP_IP = "192.168.4.1"; 
 
-// Wysyłanie zapytania GET do ESP
+
 function sendCommand(command) {
     fetch(`http://${ESP_IP}/${command}`)
         .then(response => {
@@ -199,7 +199,7 @@ function sendCommand(command) {
         });
 }
 
-// Obsługa kliknięcia i klawiatury
+
 document.addEventListener('keydown', function(event) {
     const key = event.key.toLowerCase();
 
@@ -232,7 +232,7 @@ const buttonCommands = {
     'LED_R': 'LED_R'
 };
 
-// Obsługa kliknięć przycisków
+
 Object.keys(buttonCommands).forEach(buttonId => {
     const btn = document.getElementById(buttonId);
     if (btn) {
