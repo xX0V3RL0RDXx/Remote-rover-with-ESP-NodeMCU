@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>KPE - ŁAZIK</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            font-family: sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+        }
+
+        header {
+            border-bottom: 10px solid #121e6d;
+            background-color: #162485;
+            color: gold;
+            width: 100%;
+            text-align: center;
+            padding: 20px 10px;
+            font-size: 1rem;
+        }
+
+        footer {
+            border-top: 10px solid #121e6d;
+            background-color: #162485;
+            color: gold;
+            width: 100%;
+            text-align: center;
+            padding: 15px 10px;
+        }
+
+        #Container {
+            flex: 1; /* <- Wypełnia środek między headerem a footerem */
+            background-color: white;
+            padding: 0;
+        }
+
+        h1, h2, h3 {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* LED Section Layout */
+        #LEDSection {
+            margin: 30px auto 0 auto;
+            padding: 30px;
+            max-width: 800px;
+        }
+
+        .led-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .led-row button {
+            border: none;
+            background-color: gray;
+            padding: 12px 24px;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 8px;
+            flex-shrink: 1;
+        }
+
+        /* Buttons Section Layout */
+        #ButtonsSection {
+            margin: 30px auto;
+            padding: 10px;
+            max-width: 800px;
+        }
+
+        .btn-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+
+        .btn-row button {
+            border: none;
+            background-color: gray;
+            padding: 15px 32px;
+            font-size: 2rem;
+            margin: 6px 10px;
+            cursor: pointer;
+            border-radius: 12px;
+            flex-shrink: 1;
+        }
+
+        /* Responsywność */
+        @media (max-width: 768px) {
+            header h3 {
+                font-size: 200%;
+            }
+
+            footer h1 {
+                font-size: 150%;
+            }
+
+            footer h2 {
+                font-size: 100%;
+            }
+
+            .led-row button,
+            .btn-row button {
+                width: 100%;
+                max-width: 250px;
+                font-size: 1.2rem;
+            }
+
+            .btn-row {
+                flex-direction: column;
+            }
+
+            #ButtonsSection {
+                margin: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h3 {
+                font-size: 160%;
+            }
+
+            .led-row {
+                gap: 10px;
+            }
+
+            .led-row button,
+            .btn-row button {
+                font-size: 1rem;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Koło Pasjonatów Elektroniki <br> Łazik</h1>
+    </header>
+
+    <section id="Container">
+        <!-- LED Buttons Section -->
+        <section id="LEDSection">
+            <div class="led-row">
+                <button id="LED_L">L</button>
+                <button id="BUZZER">BUZZER</button>
+                <button id="LED_R">R</button>
+            </div>
+        </section>
+
+        <!-- Navigation Buttons Section -->
+        <section id="ButtonsSection">
+            <div class="btn-row" id="row1">
+                <button id="Forward">⏫</button>
+            </div>
+            <div class="btn-row" id="row2">
+                <button id="Left">⏪</button>
+                <button id="Back">⏬</button>
+                <button id="Right">⏩</button>
+            </div>
+        </section>
+    </section>
+
+    <footer>
+        <h1>KPE</h1>
+        <h2>Projekt wykonał: Oliwier Gramala</h2>
+    </footer>
+</body>
+</html>
+
+<script>
+const ESP_IP = "192.168.4.1"; // <- zmień jeśli Twój ESP ma inne IP
+
+// Wysyłanie zapytania GET do ESP
+function sendCommand(command) {
+    fetch(`http://${ESP_IP}/${command}`)
+        .then(response => {
+            if (!response.ok) {
+                console.error("ESP error:", response.statusText);
+            }
+        })
+        .catch(error => {
+            console.error("Connection error:", error);
+        });
+}
+
+// Obsługa kliknięcia i klawiatury
+document.addEventListener('keydown', function(event) {
+    const key = event.key.toLowerCase();
+
+    const keyMap = {
+        'w': 'Forward',
+        'a': 'Left',
+        's': 'Back',
+        'd': 'Right',
+        'h': 'BUZZER',
+        'k': 'LED_L',
+        'l': 'LED_R'
+    };
+
+    const targetId = keyMap[key];
+    if (targetId) {
+        const button = document.getElementById(targetId);
+        if (button) {
+            button.click();
+        }
+    }
+});
+
+const buttonCommands = {
+    'Forward': 'forward',
+    'Left': 'left',
+    'Back': 'back',
+    'Right': 'right',
+    'BUZZER': 'buzzer',
+    'LED_L': 'LED_L',
+    'LED_R': 'LED_R'
+};
+
+// Obsługa kliknięć przycisków
+Object.keys(buttonCommands).forEach(buttonId => {
+    const btn = document.getElementById(buttonId);
+    if (btn) {
+        btn.addEventListener('click', () => {
+            sendCommand(buttonCommands[buttonId]);
+        });
+    }
+});
+</script>
